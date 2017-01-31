@@ -18,6 +18,12 @@ class UploadHandler {
 
     protected $uploadName;
 
+    public function getUserName(){
+        if (isset($_REQUEST['user_name']))
+            return $_REQUEST['user_name'];
+		return "_unknown";
+	}
+	
     /**
      * Get the original filename
      */
@@ -54,7 +60,7 @@ class UploadHandler {
         $targetFolder = $this->chunksFolder.DIRECTORY_SEPARATOR.$uuid;
         $totalParts = isset($_REQUEST['qqtotalparts']) ? (int)$_REQUEST['qqtotalparts'] : 1;
 
-        $targetPath = join(DIRECTORY_SEPARATOR, array($uploadDirectory, $uuid, $name));
+        $targetPath = join(DIRECTORY_SEPARATOR, array($uploadDirectory, $this->getUserName(), $uuid, $name));
         $this->uploadName = $name;
 
         if (!file_exists($targetPath)){
@@ -191,7 +197,7 @@ class UploadHandler {
         else {
         # non-chunked upload
 
-            $target = join(DIRECTORY_SEPARATOR, array($uploadDirectory, $uuid, $name));
+            $target = join(DIRECTORY_SEPARATOR, array($uploadDirectory, $this->getUserName(), $uuid, $name));
 
             if ($target){
                 $this->uploadName = basename($target);
@@ -236,7 +242,7 @@ class UploadHandler {
             );
         }
 
-        $target = join(DIRECTORY_SEPARATOR, array($targetFolder, $uuid));
+        $target = join(DIRECTORY_SEPARATOR, array($targetFolder, $this->getUserName(), $uuid));
 
         if (is_dir($target)){
             $this->removeDir($target);
@@ -244,7 +250,8 @@ class UploadHandler {
         } else {
             return array("success" => false,
                 "error" => "File not found! Unable to delete.".$url,
-                "path" => $uuid
+                "path" => $uuid,
+                "target" => $target
             );
         }
 
